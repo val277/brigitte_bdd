@@ -1,3 +1,3 @@
-CREATE DATABASE IF NOT EXISTS bdd_brigitte;
+CREATE DATABASE IF NOT EXISTS brigitte_bdd;
 
-USE bdd_brigitte;
+USE brigitte_bdd;
