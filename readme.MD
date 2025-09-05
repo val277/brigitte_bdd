@@ -80,8 +80,11 @@ WHERE
 ### 7 - Le nom et l’âge des animaux en 2017.
 
 ```sql
--- normal
-
+SELECT
+	nom,
+	TIMESTAMPDIFF(YEAR, dateNaissance, "2017-01-01") AS "Age"
+FROM
+	animal;
 ```
 
 ### 8 - Le nom des soigneurs qui habitent Ushuaïa.
@@ -187,15 +190,29 @@ WHERE
 ### 17 - Les noms des responsables et les noms des soigneurs de Charly.
 
 ```sql
--- normal
-
+SELECT
+	animal.nom,
+	GROUP_CONCAT(employe.nom) AS "Responsables et Soigneurs"
+FROM
+	animal
+	JOIN animal_employe ON animal_employe.id_animal = animal.id
+	JOIN employe ON employe.id = animal_employe.id_employe
+WHERE
+	animal.nom = "Charly"
+GROUP BY
+	animal.nom
 ```
 
 ### 18 - Le nom et le pays d’origine de l’animal doyen du refuge (il peut y en avoir plusieurs).
 
 ```sql
--- normal
-
+SELECT
+	MIN(animal.dateNaissance) AS "Date de naissance",
+	animal.nom AS "Nom",
+	origine.nom AS "Origine"
+FROM
+	animal
+	JOIN origine ON origine.id = animal.id_origine;
 ```
 
 ### 19 - Le nom, le type et l’année de naissance des animaux qui ont contracté toutes les maladies (connues) du refuge.
@@ -208,8 +225,17 @@ WHERE
 ### 20 - Le nom, le type et le pays d’origine des animaux qui partagent la cage de Charly.
 
 ```sql
--- normal
-
+SELECT
+	animal.nom,
+	animal.race,
+	cage.id
+FROM
+	animal
+	JOIN origine ON origine.id = animal.id_origine
+	JOIN cage ON cage.id = animal.id_cage
+WHERE
+	cage.id = 1
+	AND animal.nom != "Charly";
 ```
 
 ### 21 - Le nom et l’adresse des employés qui sont soigneurs d’animaux de tous types, on fait référence aux types des animaux du refuge.
@@ -222,8 +248,11 @@ WHERE
 ### 22 - Lister le nom et l'âge de tous les animaux.
 
 ```sql
--- facile
-
+SELECT
+	nom,
+	TIMESTAMPDIFF(YEAR, dateNaissance, NOW()) AS "Age"
+FROM
+	animal;
 ```
 
 ### 23 - Donner les caractéristiques de l'animal appelé HECTOR.
@@ -255,36 +284,67 @@ GROUP BY
 ### 25 - Donner les noms des singes de plus de 10 ans et originaire d'Afrique.
 
 ```sql
--- normal
-
+SELECT
+	animal.nom
+FROM
+	animal
+	JOIN origine ON origine.id = animal.id_origine
+	JOIN classe ON classe.id = animal.id_classe
+	JOIN ordre ON ordre.id = animal.id_ordre
+WHERE
+	classe.id = 8
+	AND ordre.id = 7
+	AND origine.nom = "Afrique";
 ```
 
 ### 26 - Donner les noms des singes ainsi que des animaux de plus de 8 ans.
 
 ```sql
--- normal
-
+SELECT
+	nom
+FROM
+	animal
+WHERE
+	TIMESTAMPDIFF(YEAR, dateNaissance, NOW()) > 8;
 ```
 
 ### 27 - Donner les races des animaux dont le numéro de menu est 1 et l'âge est supérieur à 10.
 
 ```sql
--- normal
-
+SELECT
+	race
+FROM
+	animal
+	JOIN menu ON menu.id = animal.id_menu
+WHERE
+	menu.id = 1
+	AND TIMESTAMPDIFF(YEAR, dateNaissance, NOW()) > 10;
 ```
 
 ### 28 - Donner les menus plus 2 fois moins riches en viande qu'en légume?
 
 ```sql
--- normal
-
+SELECT
+	id,
+	viande,
+	legume
+FROM
+	MENU
+WHERE
+	legume / 2 >= viande;
 ```
 
 ### 29 - Donner l'âge et l'origine des animaux qui sont amis de l'homme.
 
 ```sql
--- normal
-
+SELECT
+	TIMESTAMPDIFF(YEAR, dateNaissance, NOW()) AS "Age",
+	origine.nom AS "Origine"
+FROM
+	animal
+	JOIN origine ON origine.id = animal.id_origine
+WHERE
+	domestique = 1;
 ```
 
 ### 30 - Numéro de menu et quantité de viande pour les animaux qui ont une attitude amicale envers l'homme.
@@ -341,13 +401,24 @@ GROUP BY
 ### 1. Un employé est soit un gardien, soit un responsable.
 
 ```sql
--- normal
-
+SELECT
+	employe.nom,
+	poste.nom
+FROM
+	employe
+	JOIN poste ON poste.id = employe.id_poste
 ```
 
 ### 2. Il n’y a pas de gardien affecté à des cages vides
 
 ```sql
--- normal
-
+SELECT
+	cage.id,
+	employe.nom,
+	animal.nom
+FROM
+	cage
+	LEFT JOIN cage_employe ON cage_employe.id_cage = cage.id
+	LEFT JOIN employe ON employe.id = cage_employe.id_employe
+	LEFT JOIN animal ON cage.id = animal.id_cage
 ```
